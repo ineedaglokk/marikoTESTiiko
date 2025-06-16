@@ -17,9 +17,9 @@ const Profile = () => {
       <Header />
 
       {/* Main Content */}
-      <div className="flex-1 px-4 md:px-12 max-w-6xl mx-auto w-full">
+      <div className="flex-1 px-3 md:px-12 max-w-sm md:max-w-6xl mx-auto w-full">
         {/* Location Banner */}
-        <div className="mt-8 md:mt-12 flex items-center justify-between gap-4">
+        <div className="mt-3 md:mt-8 flex items-center justify-between gap-2">
           <div className="flex-1">
             <img
               src="https://cdn.builder.io/api/v1/image/assets/TEMP/f332e5a598bea4896258ee94a78f59e081351903?placeholderIfAbsent=true"
@@ -38,7 +38,7 @@ const Profile = () => {
         </div>
 
         {/* Profile Action Buttons */}
-        <div className="mt-8 md:mt-12 space-y-6 md:space-y-8">
+        <div className="mt-4 md:mt-8 space-y-3 md:space-y-6">
           <ActionButton
             icon={<RubleIcon className="w-full h-full text-white" />}
             title="Баланс: 1987"

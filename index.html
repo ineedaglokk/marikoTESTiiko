@@ -2,7 +2,10 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Хачапури Марико бот</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -10,6 +13,34 @@
       href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <style>
+      /* Telegram WebApp specific styles */
+      body {
+        margin: 0;
+        padding: 0;
+        overscroll-behavior: none;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* Prevent zoom on iOS */
+      input,
+      select,
+      textarea {
+        font-size: 16px !important;
+      }
+
+      /* Hide scrollbar but allow scrolling */
+      ::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* Ensure proper mobile viewport */
+      html,
+      body {
+        height: 100%;
+        overflow-x: hidden;
+      }
+    </style>
   </head>
 
   <body>

@@ -24,7 +24,7 @@ export const BarcodeModal = ({
 
       {/* Modal Content */}
       <div
-        className="relative z-10 w-full max-w-md mx-4 bg-mariko-primary rounded-3xl p-6 md:p-8"
+        className="relative z-10 w-full max-w-xs md:max-w-md mx-3 md:mx-4 bg-mariko-primary rounded-2xl md:rounded-3xl p-4 md:p-6"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -37,12 +37,12 @@ export const BarcodeModal = ({
         </button>
 
         {/* Barcode Container */}
-        <div className="flex flex-col items-center justify-center min-h-[400px] space-y-8">
+        <div className="flex flex-col items-center justify-center min-h-[280px] md:min-h-[400px] space-y-4 md:space-y-8">
           {/* Barcode */}
-          <div className="bg-white p-8 rounded-2xl">
+          <div className="bg-white p-4 md:p-8 rounded-xl md:rounded-2xl">
             <div className="flex flex-col items-center space-y-4">
               {/* Barcode Lines */}
-              <div className="flex items-end space-x-1 h-32">
+              <div className="flex items-end space-x-1 h-20 md:h-32">
                 {Array.from({ length: 40 }, (_, i) => {
                   const heights = [
                     "h-24",
@@ -112,7 +112,7 @@ export const BarcodeModal = ({
               </div>
 
               {/* Barcode Number */}
-              <div className="text-black font-mono text-2xl font-bold tracking-wider">
+              <div className="text-black font-mono text-lg md:text-2xl font-bold tracking-wider">
                 {cardNumber}
               </div>
             </div>
@@ -121,7 +121,7 @@ export const BarcodeModal = ({
           {/* Back Button */}
           <button
             onClick={onClose}
-            className="bg-mariko-primary border-2 border-white rounded-[90px] px-8 py-3 text-white font-el-messiri text-xl font-bold tracking-tight hover:bg-white hover:text-mariko-primary transition-colors"
+            className="bg-mariko-primary border-2 border-white rounded-[45px] md:rounded-[90px] px-6 md:px-8 py-2 md:py-3 text-white font-el-messiri text-lg md:text-xl font-bold tracking-tight hover:bg-white hover:text-mariko-primary transition-colors"
           >
             Назад
           </button>
