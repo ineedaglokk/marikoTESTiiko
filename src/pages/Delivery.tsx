@@ -112,14 +112,15 @@ const Delivery = () => {
       </div>
 
       {/* Delivery Truck Illustration - Fill remaining space */}
-      <div className="flex-grow flex items-end justify-center">
+      <div className="flex-grow flex items-center justify-center overflow-hidden">
         <img
           src="https://cdn.builder.io/api/v1/image/assets/TEMP/7b483c106c0873fef56b5de8673db668ccbe0325?placeholderIfAbsent=true"
           alt="Грузовик доставки Марико"
-          className="w-full h-auto max-w-md lg:max-w-lg"
+          className="w-full h-full"
           style={{
-            aspectRatio: "0.725",
-            objectFit: "contain",
+            objectFit: "cover",
+            objectPosition: "center",
+            transform: "scale(1.5)",
           }}
         />
       </div>
