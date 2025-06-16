@@ -1,12 +1,4 @@
-import {
-  Calendar,
-  Truck,
-  Star,
-  MapPin,
-  Search,
-  Utensils,
-  ChefHat,
-} from "lucide-react";
+import { Calendar, Truck, Star, MapPin, Search, ChefHat } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { ActionButton } from "@/components/ActionButton";
@@ -97,15 +89,6 @@ const Index = () => {
           />
         </div>
 
-        {/* Franchise Button */}
-        <div className="mt-6 md:mt-8">
-          <ActionButton
-            icon={<Utensils className="w-full h-full" />}
-            title="Франшиза ресторана"
-            onClick={() => console.log("Франшиза")}
-          />
-        </div>
-
         {/* Quote Section */}
         <div className="mt-8 md:mt-12 relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
           <div className="bg-gradient-to-br from-orange-300 to-orange-500 rounded-[90px] p-6 md:p-8 relative overflow-hidden">
@@ -131,7 +114,7 @@ const Index = () => {
           {/* Restaurants Header */}
           <div className="flex items-center justify-between mb-8 md:mb-12">
             <h2 className="text-white font-el-messiri text-4xl md:text-5xl font-bold tracking-tight">
-              Рестор��ны
+              Рестораны
             </h2>
             <button className="bg-mariko-primary rounded-full p-3 md:p-4 hover:scale-105 transition-transform">
               <Search className="w-8 h-8 md:w-10 md:h-10 text-white" />

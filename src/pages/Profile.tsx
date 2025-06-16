@@ -53,7 +53,7 @@ const Profile = () => {
 
           <ActionButton
             icon={<User className="w-full h-full" />}
-            title="Профиль"
+            title="Редактирование профиля"
             onClick={() => navigate("/edit-profile")}
           />
         </div>
