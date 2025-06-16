@@ -134,7 +134,7 @@ const Index = () => {
               className="w-auto h-auto max-w-xs lg:max-w-sm object-contain object-bottom lg:object-right-bottom"
               style={{
                 filter: "drop-shadow(0 0 20px rgba(0,0,0,0.1))",
-                transform: "scale(1.05)",
+                transform: "scale(1.05) translateX(20%)",
               }}
             />
           </div>
