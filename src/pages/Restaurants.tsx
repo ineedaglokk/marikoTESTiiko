@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, MapPin, Parking, Star, Search } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { CitySelector, cities } from "@/components/CitySelector";
@@ -21,6 +21,7 @@ interface Restaurant {
 
 const Restaurants = () => {
   const navigate = useNavigate();
+  const { restaurantId } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
   const { selectedCity, setSelectedCity } = useCityContext();
 
@@ -64,12 +65,17 @@ const Restaurants = () => {
     return cityMap[cityName] || "47/nizhny-novgorod";
   }
 
-  const filteredRestaurants = allRestaurants.filter(
-    (restaurant) =>
-      restaurant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      restaurant.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      restaurant.city.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  // Если передан ID ресторана, показываем только его
+  const filteredRestaurants = restaurantId
+    ? allRestaurants.filter((restaurant) => restaurant.id === restaurantId)
+    : allRestaurants.filter(
+        (restaurant) =>
+          restaurant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          restaurant.address
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          restaurant.city.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
 
   const selectRestaurant = (restaurant: Restaurant) => {
     // Находим город этого ресторана и устанавливаем его как выбранный
@@ -98,28 +104,44 @@ const Restaurants = () => {
             <ArrowLeft className="w-6 h-6" />
           </button>
           <h1 className="text-white font-el-messiri text-3xl md:text-4xl font-bold flex-1">
-            Рестораны
+            {restaurantId ? "Ресторан" : "Рестораны"}
           </h1>
-          <CitySelector
-            selectedCity={selectedCity}
-            onCityChange={setSelectedCity}
-            className="flex-shrink-0"
-          />
+          {!restaurantId && (
+            <CitySelector
+              selectedCity={selectedCity}
+              onCityChange={setSelectedCity}
+              className="flex-shrink-0"
+            />
+          )}
         </div>
 
-        {/* Search */}
-        <div className="mb-6 relative">
-          <div className="bg-mariko-secondary rounded-[90px] px-6 py-4 flex items-center gap-3">
-            <Search className="w-6 h-6 text-white" />
-            <input
-              type="text"
-              placeholder="Поиск по городам и адресам..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 bg-transparent text-white placeholder-white/60 border-none outline-none font-el-messiri text-xl"
-            />
+        {/* Search - скрыто если показываем конкретный ресторан */}
+        {!restaurantId && (
+          <div className="mb-6 relative">
+            <div className="bg-mariko-secondary rounded-[90px] px-6 py-4 flex items-center gap-3">
+              <Search className="w-6 h-6 text-white" />
+              <input
+                type="text"
+                placeholder="Поиск по городам и адресам..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1 bg-transparent text-white placeholder-white/60 border-none outline-none font-el-messiri text-xl"
+              />
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Показать все рестораны - если просматр��ваем конкретный */}
+        {restaurantId && (
+          <div className="mb-6">
+            <button
+              onClick={() => navigate("/restaurants")}
+              className="w-full bg-mariko-secondary text-white font-el-messiri text-lg font-semibold py-3 px-6 rounded-[90px] hover:bg-mariko-accent transition-colors"
+            >
+              Показать все рестораны
+            </button>
+          </div>
+        )}
 
         {/* Restaurants List */}
         <div className="space-y-4">

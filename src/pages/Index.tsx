@@ -146,7 +146,7 @@ const Index = () => {
                 key={restaurant.id}
                 city={restaurant.city}
                 address={restaurant.address}
-                onClick={() => navigate("/restaurants")}
+                onClick={() => navigate(`/restaurants/${restaurant.id}`)}
               />
             ))}
           </div>
