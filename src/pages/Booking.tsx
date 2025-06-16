@@ -4,19 +4,35 @@ import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { botApi, telegramWebApp } from "@/lib/botApi";
+import { useCityContext } from "@/contexts/CityContext";
 
 const Booking = () => {
   const navigate = useNavigate();
+  const { selectedCity } = useCityContext();
+
+  const currentRestaurant = selectedCity?.restaurants[0];
+  const defaultRestaurantName = currentRestaurant
+    ? `${currentRestaurant.city}, ${currentRestaurant.address}`
+    : "Нижний Новгород, Рождественская, 39";
+
   const [formData, setFormData] = useState({
     name: "Валентина", // Подтягивается из профиля
     phone: "+7 (930) 805-22-22", // Подтягивается из профиля
     guests: "2",
     date: "",
     time: "",
-    restaurant: "Нижний Новгород, Рождественская, 39", // Подтягивается из профиля
+    restaurant: defaultRestaurantName, // Подтягивается из выбранного города
     comment: "",
   });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Обновляем ресторан при смене города
+    if (selectedCity && selectedCity.restaurants.length > 0) {
+      const newRestaurant = `${selectedCity.restaurants[0].city}, ${selectedCity.restaurants[0].address}`;
+      setFormData((prev) => ({ ...prev, restaurant: newRestaurant }));
+    }
+  }, [selectedCity]);
 
   useEffect(() => {
     // Загружаем данные пользователя из Telegram/профиля
@@ -31,7 +47,6 @@ const Booking = () => {
             ...prev,
             name: profile.name,
             phone: profile.phone,
-            restaurant: profile.selectedRestaurant,
           }));
         }
       } catch (error) {
@@ -42,14 +57,17 @@ const Booking = () => {
     loadUserData();
   }, []);
 
-  const restaurants = [
+  // Если выбран город, показываем только его рестораны, иначе все
+  const restaurants = selectedCity?.restaurants.map(
+    (r) => `${r.city}, ${r.address}`,
+  ) || [
     "Нижний Новгород, Рождественская, 39",
     "Нижний Новгород, Парк Швейцария",
     "Нижний Новгород, Волжская набережная, 23а",
     "СПб, Сенная, 5",
     "СПб, Итальянская, 6/4",
     "СПб, Малая Морская, 5а",
-    "СПб, Малая Садов��я, 3/54",
+    "СПб, Малая Садовая, 3/54",
     "Новосибирск",
     "Кемерово",
     "Томск",
@@ -201,9 +219,12 @@ const Booking = () => {
               required
             >
               {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                <option key={num} value={num} className="bg-mariko-secondary">
-                  {num}{" "}
-                  {num === 1 ? "человек" : num < 5 ? "человека" : "человек"}
+                <option
+                  key={num}
+                  value={num}
+                  className="bg-mariko-secondary text-white"
+                >
+                  {num}
                 </option>
               ))}
             </select>
@@ -241,11 +262,15 @@ const Booking = () => {
               className="w-full bg-transparent text-white border-none outline-none font-el-messiri text-xl"
               required
             >
-              <option value="" className="bg-mariko-secondary">
+              <option value="" className="bg-mariko-secondary text-white">
                 Выберите время
               </option>
               {timeSlots.map((time) => (
-                <option key={time} value={time} className="bg-mariko-secondary">
+                <option
+                  key={time}
+                  value={time}
+                  className="bg-mariko-secondary text-white"
+                >
                   {time}
                 </option>
               ))}
@@ -270,7 +295,7 @@ const Booking = () => {
                 <option
                   key={restaurant}
                   value={restaurant}
-                  className="bg-mariko-secondary"
+                  className="bg-mariko-secondary text-white"
                 >
                   {restaurant}
                 </option>
@@ -281,15 +306,16 @@ const Booking = () => {
           {/* Comment */}
           <div className="bg-mariko-secondary rounded-[90px] px-6 py-4">
             <label className="block text-white font-el-messiri text-lg font-semibold mb-2">
-              Комментарий (необязательно)
+              Комментарий (опционально)
             </label>
             <textarea
               value={formData.comment}
               onChange={(e) =>
                 setFormData({ ...formData, comment: e.target.value })
               }
+              rows={3}
+              className="w-full bg-transparent text-white placeholder-white/60 border-none outline-none font-el-messiri text-xl resize-none"
               placeholder="Особые пожелания..."
-              className="w-full bg-transparent text-white placeholder-white/60 border-none outline-none font-el-messiri text-xl resize-none h-20"
             />
           </div>
 
@@ -297,18 +323,13 @@ const Booking = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-mariko-primary border-2 border-white rounded-[90px] px-8 py-4 text-white font-el-messiri text-2xl font-bold tracking-tight hover:bg-white hover:text-mariko-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-orange-400 to-orange-600 text-mariko-secondary font-el-messiri text-2xl font-bold py-6 rounded-[90px] hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
-            {loading ? (
-              <div className="flex items-center justify-center gap-2">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
-                Отправка...
-              </div>
-            ) : (
-              "Забронировать"
-            )}
+            {loading ? "Отправка..." : "Забронировать столик"}
           </button>
         </form>
+
+        <div className="mb-8"></div>
       </div>
 
       {/* Bottom Navigation */}
