@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 interface BottomNavigationProps {
-  currentPage: "home" | "profile" | "franchise";
+  currentPage: "home" | "profile";
 }
 
 export const BottomNavigation = ({ currentPage }: BottomNavigationProps) => {
@@ -17,12 +17,6 @@ export const BottomNavigation = ({ currentPage }: BottomNavigationProps) => {
       onClick: () => navigate("/profile"),
     },
     {
-      id: "franchise",
-      label: "Франшиза",
-      icon: MapPin,
-      onClick: () => navigate("/franchise"),
-    },
-    {
       id: "home",
       label: "Главная",
       icon: Home,
@@ -32,7 +26,7 @@ export const BottomNavigation = ({ currentPage }: BottomNavigationProps) => {
 
   return (
     <div className="bg-mariko-dark">
-      <div className="flex justify-around items-end relative">
+      <div className="flex justify-center items-end relative gap-16 md:gap-32">
         {navItems.map((item) => {
           const isActive = item.id === currentPage;
           const Icon = item.icon;
