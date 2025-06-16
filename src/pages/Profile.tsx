@@ -1,10 +1,13 @@
 import { CreditCard, User, MapPin } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { ActionButton } from "@/components/ActionButton";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { RubleIcon } from "@/components/RubleIcon";
 
 const Profile = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-mariko-primary overflow-hidden flex flex-col">
       {/* Header */}
@@ -48,7 +51,7 @@ const Profile = () => {
           <ActionButton
             icon={<User className="w-full h-full" />}
             title="Профиль"
-            onClick={() => console.log("Профиль")}
+            onClick={() => navigate("/edit-profile")}
           />
         </div>
 
