@@ -101,9 +101,13 @@ const EditProfile = () => {
           </div>
           <div className="flex-shrink-0 ml-4">
             <img
-              src="https://cdn.builder.io/api/v1/image/assets/TEMP/093934205b7e6b614cb384b055954bd8bd17366c?placeholderIfAbsent=true"
-              alt="Грузинский персонаж"
-              className="w-32 h-auto md:w-40"
+              src="https://cdn.builder.io/api/v1/image/assets/TEMP/02b61b7aabad947a6521432b5c65b416619b1a08?placeholderIfAbsent=true"
+              alt="Грузинский воин"
+              className="w-32 h-auto md:w-40 max-w-40"
+              style={{
+                aspectRatio: "1.499",
+                filter: "drop-shadow(13px -2px 28px rgba(0, 0, 0, 0.25))",
+              }}
             />
           </div>
         </div>
