@@ -65,7 +65,7 @@ const Restaurants = () => {
     return cityMap[cityName] || "47/nizhny-novgorod";
   }
 
-  // Если передан ID ресторана, показываем только его
+  // Е��ли передан ID ресторана, показываем только его
   const filteredRestaurants = restaurantId
     ? allRestaurants.filter((restaurant) => restaurant.id === restaurantId)
     : allRestaurants.filter(
@@ -76,6 +76,21 @@ const Restaurants = () => {
             .includes(searchQuery.toLowerCase()) ||
           restaurant.city.toLowerCase().includes(searchQuery.toLowerCase()),
       );
+
+  // Автоматически устанавливаем город при просмотре конкретного ресторана
+  useEffect(() => {
+    if (restaurantId) {
+      const restaurant = allRestaurants.find((r) => r.id === restaurantId);
+      if (restaurant) {
+        const restaurantCity = cities.find((city) =>
+          city.restaurants.some((r) => r.id === restaurant.id),
+        );
+        if (restaurantCity && selectedCity?.id !== restaurantCity.id) {
+          setSelectedCity(restaurantCity);
+        }
+      }
+    }
+  }, [restaurantId, selectedCity, setSelectedCity, allRestaurants]);
 
   const selectRestaurant = (restaurant: Restaurant) => {
     // Находим город этого ресторана и устанавливаем его как выбранный
@@ -131,7 +146,7 @@ const Restaurants = () => {
           </div>
         )}
 
-        {/* Показать все рестораны - если просматр��ваем конкретный */}
+        {/* Показать все рестораны - если просматриваем конкретный */}
         {restaurantId && (
           <div className="mb-6">
             <button
