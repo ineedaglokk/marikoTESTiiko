@@ -111,12 +111,13 @@ const Index = () => {
       {/* Quote Section - Vertical text along the chef */}
       <div className="mt-8 md:mt-12 relative z-10 px-3 md:px-6">
         <div className="max-w-sm md:max-w-6xl mx-auto relative flex justify-end">
-          {/* Vertical Column Quote positioned along the chef */}
-          <div className="absolute left-8 md:left-16 lg:left-24 top-4 md:top-8 z-40">
+          {/* Vertical Column Quote positioned along the chef - extending beyond left edge */}
+          <div className="absolute left-0 top-4 md:top-8 z-60">
             <div
               className="text-white font-el-messiri text-2xl md:text-3xl lg:text-4xl font-bold leading-tight"
               style={{
-                maxWidth: "120px",
+                width: "200px",
+                transform: "translateX(-20%)",
                 filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.3))",
               }}
             >
