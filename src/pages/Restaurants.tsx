@@ -43,7 +43,7 @@ const Restaurants = () => {
 
   function getCityUrlSlug(cityName: string): string {
     const cityMap: { [key: string]: string } = {
-      "Нижний Новгород": "nizhnynovgorod",
+      "Нижний Новгоро��": "nizhnynovgorod",
       "Санкт-Петербург": "spb",
       Казань: "kazan",
       Кемерово: "kemerovo",
@@ -77,7 +77,7 @@ const Restaurants = () => {
           restaurant.city.toLowerCase().includes(searchQuery.toLowerCase()),
       );
 
-  // Автоматически устанавливаем город при просмотре конкретного ресторана
+  // Автоматически устанавливаем горо�� при просмотре конкретного ресторана
   useEffect(() => {
     if (restaurantId) {
       const restaurant = allRestaurants.find((r) => r.id === restaurantId);
@@ -154,8 +154,12 @@ const Restaurants = () => {
               className="bg-mariko-secondary rounded-[90px] p-6"
             >
               <div
-                onClick={() => selectRestaurant(restaurant)}
-                className="flex items-center gap-4 mb-4 cursor-pointer hover:bg-white/5 rounded-lg p-2 transition-colors"
+                onClick={
+                  restaurantId ? undefined : () => selectRestaurant(restaurant)
+                }
+                className={`flex items-center gap-4 mb-4 rounded-lg p-2 transition-colors ${
+                  restaurantId ? "" : "cursor-pointer hover:bg-white/5"
+                }`}
               >
                 <MapPin className="w-8 h-8 text-white flex-shrink-0" />
                 <div className="flex-1">
