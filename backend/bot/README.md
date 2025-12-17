@@ -39,6 +39,12 @@ Telegram не “хостит” бота — он отвечает на ком�
 
 ### VPS / Timeweb
 
+Если бот на Railway — на Timeweb держите его в standby, чтобы не было конфликта `409`:
+```bash
+# /root/HM-projecttt/backend/bot/.env
+BOT_POLLING_ENABLED=false
+```
+
 1) Установите PM2 (1 раз):
 ```bash
 npm i -g pm2
