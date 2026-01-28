@@ -69,7 +69,7 @@ function formatBucketError(error) {
     return `Бакет "${YANDEX_STORAGE_BUCKET_NAME}" не существует. ` +
            `Пожалуйста, создайте бакет в Yandex Cloud Console: ` +
            `https://console.cloud.yandex.ru/folders/-/storage/buckets. ` +
-           `Инструкция: см. YANDEX_STORAGE_SETUP.md`;
+          `Инструкция: см. instructions/integrations/YANDEX_STORAGE_SETUP.md`;
   }
   return error.message;
 }

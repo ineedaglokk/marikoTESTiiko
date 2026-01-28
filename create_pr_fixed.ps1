@@ -84,10 +84,10 @@ Write-Host ""
 
 # Создаем PR
 Write-Host "Создаем Pull Request..." -ForegroundColor Yellow
-if (Test-Path "PR_DESCRIPTION.md") {
-    gh pr create --base main --head $branchName --title "feat: ограничение максимального количества одинаковых блюд в корзине" --body-file PR_DESCRIPTION.md --web
+if (Test-Path "instructions/workflows/PR_DESCRIPTION.md") {
+    gh pr create --base main --head $branchName --title "feat: ограничение максимального количества одинаковых блюд в корзине" --body-file instructions/workflows/PR_DESCRIPTION.md --web
 } else {
-    Write-Host "Файл PR_DESCRIPTION.md не найден, создаем PR без описания" -ForegroundColor Yellow
+    Write-Host "Файл instructions/workflows/PR_DESCRIPTION.md не найден, создаем PR без описания" -ForegroundColor Yellow
     gh pr create --base main --head $branchName --title "feat: ограничение максимального количества одинаковых блюд в корзине" --web
 }
 Write-Host ""

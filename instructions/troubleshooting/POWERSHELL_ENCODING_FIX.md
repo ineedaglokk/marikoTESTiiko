@@ -61,7 +61,7 @@ chcp 65001 | Out-Null
 
 ### Решение 5: Настроить профиль PowerShell постоянно
 
-**Подробная инструкция:** См. файл `SETUP_POWERSHELL_PROFILE.md`
+**Подробная инструкция:** См. файл `instructions/setup/SETUP_POWERSHELL_PROFILE.md`
 
 **Быстрая настройка:**
 
@@ -116,7 +116,7 @@ git commit -m "feat: добавлено ограничение максимал�
 - Добавлена поддержка maxCartItemQuantity в MenuItemComponent
 - Кнопка + становится неактивной при достижении максимального количества"
 git push origin feat/cart-item-quantity-limit
-gh pr create --base main --head feat/cart-item-quantity-limit --title "feat: ограничение максимального количества одинаковых блюд в корзине" --body-file PR_DESCRIPTION.md --web
+gh pr create --base main --head feat/cart-item-quantity-limit --title "feat: ограничение максимального количества одинаковых блюд в корзине" --body-file instructions/workflows/PR_DESCRIPTION.md --web
 ```
 
 ## Проверка кодировки

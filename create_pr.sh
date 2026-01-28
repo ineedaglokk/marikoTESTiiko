@@ -48,7 +48,7 @@ git push origin $BRANCH_NAME
 # 7. Создаем PR через GitHub CLI
 echo ""
 echo "Создаем Pull Request..."
-gh pr create --base main --head $BRANCH_NAME --title "feat: ограничение максимального количества одинаковых блюд в корзине" --body-file PR_DESCRIPTION.md
+gh pr create --base main --head $BRANCH_NAME --title "feat: ограничение максимального количества одинаковых блюд в корзине" --body-file instructions/workflows/PR_DESCRIPTION.md
 
 echo ""
 echo "✅ Готово! PR создан."

@@ -1,6 +1,6 @@
 # Архитектура проекта
 
-> **Примечание:** Инструкции по развертыванию см. в [`DEPLOYMENT_GUIDE.md`](./DEPLOYMENT_GUIDE.md)
+> **Примечание:** Инструкции по развертыванию см. в [`DEPLOYMENT_GUIDE.md`](../deployment/DEPLOYMENT_GUIDE.md)
 
 ## Обзор
 
@@ -240,6 +240,6 @@ mariko-storage/
 
 ## Дополнительные ресурсы
 
-- [`DEPLOYMENT_GUIDE.md`](./DEPLOYMENT_GUIDE.md) — руководство по развертыванию
-- [`RAILWAY.md`](./RAILWAY.md) — специфичные настройки Railway
-- [`ADMIN_SETUP.md`](./ADMIN_SETUP.md) — настройка админ-доступа
+- [`DEPLOYMENT_GUIDE.md`](../deployment/DEPLOYMENT_GUIDE.md) — руководство по развертыванию
+- [`RAILWAY.md`](../deployment/RAILWAY.md) — специфичные настройки Railway
+- [`ADMIN_SETUP.md`](../setup/ADMIN_SETUP.md) — настройка админ-доступа

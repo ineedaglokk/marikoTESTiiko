@@ -173,4 +173,4 @@ railway status
 
 - [`DEPLOYMENT_GUIDE.md`](./DEPLOYMENT_GUIDE.md) — полное руководство по развертыванию
 - [`RAILWAY_ENV_VARIABLES_EXPLAINED.md`](./RAILWAY_ENV_VARIABLES_EXPLAINED.md) — объяснение переменных окружения
-- [`ARCHITECTURE.md`](./ARCHITECTURE.md) — архитектура проекта
+- [`ARCHITECTURE.md`](../overview/ARCHITECTURE.md) — архитектура проекта

@@ -77,5 +77,5 @@ git push origin feat/cart-item-quantity-limit
 После успешного push создайте PR:
 
 ```bash
-gh pr create --base main --head feat/cart-item-quantity-limit --title "feat: ограничение максимального количества одинаковых блюд в корзине" --body-file PR_DESCRIPTION.md --web
+gh pr create --base main --head feat/cart-item-quantity-limit --title "feat: ограничение максимального количества одинаковых блюд в корзине" --body-file instructions/workflows/PR_DESCRIPTION.md --web
 ```

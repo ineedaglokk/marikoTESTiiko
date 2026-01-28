@@ -58,8 +58,8 @@
 - `frontend/src/shared/ui/ui/menu-item.tsx` - компонент карточки блюда с поддержкой лимита
 
 ### Документация:
-- `CHANGES_FOR_VK_APP.md` - инструкция для применения изменений в ветке vk_app
-- `PR_INSTRUCTIONS.md` - инструкция по созданию PR
+- `instructions/integrations/CHANGES_FOR_VK_APP.md` - инструкция для применения изменений в ветке vk_app
+- `instructions/workflows/PR_INSTRUCTIONS.md` - инструкция по созданию PR
 
 ## Тестирование
 

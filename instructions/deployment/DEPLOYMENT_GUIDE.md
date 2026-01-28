@@ -253,7 +253,7 @@ vercel logs <deployment-url>
 
 ## Дополнительные ресурсы
 
-- `ARCHITECTURE.md` — полное описание архитектуры проекта
+- `instructions/overview/ARCHITECTURE.md` — полное описание архитектуры проекта
 - `RAILWAY.md` — детальная документация по Railway
 - `RAILWAY_ENV_VARIABLES_EXPLAINED.md` — объяснение переменных окружения
 - `scripts/RAILWAY_ENV_SETUP.md` — инструкция по настройке переменных Railway

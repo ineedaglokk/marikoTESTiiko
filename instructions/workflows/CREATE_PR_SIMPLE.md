@@ -32,7 +32,7 @@ Invoke-Expression "& '$PWD\create_pr_fixed.ps1'"
 - **Способ 2:** Меню Пуск → найдите "Git Bash"
 - **Способ 3:** Настройте Git Bash как терминал по умолчанию в Cursor
 
-**Подробная инструкция:** См. файл `GIT_BASH_SETUP.md`
+**Подробная инструкция:** См. файл `instructions/setup/GIT_BASH_SETUP.md`
 
 После открытия Git Bash выполните:
 ```bash
@@ -69,7 +69,7 @@ git commit -m "feat: добавлено ограничение максимал�
 git push origin feat/cart-item-quantity-limit
 
 # Создать PR
-gh pr create --base main --head feat/cart-item-quantity-limit --title "feat: ограничение максимального количества одинаковых блюд в корзине" --body-file PR_DESCRIPTION.md --web
+gh pr create --base main --head feat/cart-item-quantity-limit --title "feat: ограничение максимального количества одинаковых блюд в корзине" --body-file instructions/workflows/PR_DESCRIPTION.md --web
 ```
 
 ## Почему Git Bash лучше?

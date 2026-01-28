@@ -57,7 +57,7 @@ railway variables --service frontend
 2. Выберите ваш проект
 3. Выберите сервис (Frontend, Backend или Bot)
 4. Перейдите в **Variables** → **New Variable**
-5. Добавьте переменные согласно списку в `RAILWAY.md`
+5. Добавьте переменные согласно списку в `../instructions/deployment/RAILWAY.md`
 
 ## Важные моменты
 
@@ -108,4 +108,4 @@ railway link
 
 ## Дополнительная информация
 
-Полный список переменных и их описание см. в `RAILWAY.md`.
+Полный список переменных и их описание см. в `../instructions/deployment/RAILWAY.md`.

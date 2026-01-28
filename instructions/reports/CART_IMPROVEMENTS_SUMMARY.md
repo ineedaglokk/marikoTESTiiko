@@ -13,14 +13,14 @@
 - Лимит берется из настроек выбранного ресторана (по умолчанию 10)
 
 ### 3. Обновлена документация
-- Обновлен `PR_DESCRIPTION.md` с новыми изменениями
+- Обновлен `instructions/workflows/PR_DESCRIPTION.md` с новыми изменениями
 - Обновлен `create_pr.bat` с новым сообщением коммита
 
 ## Файлы, которые были изменены
 
 1. `frontend/src/shared/ui/ui/menu-item.tsx` - добавлена поддержка лимита и disabled состояние
 2. `frontend/src/features/menu/Menu.tsx` - добавлена передача maxCartItemQuantity
-3. `PR_DESCRIPTION.md` - обновлено описание PR
+3. `instructions/workflows/PR_DESCRIPTION.md` - обновлено описание PR
 4. `create_pr.bat` - обновлено сообщение коммита
 
 ## Как создать PR
@@ -46,7 +46,7 @@ git branch --show-current
 git checkout -b feat/cart-item-quantity-limit
 
 # Добавьте изменения
-git add frontend/src/shared/ui/ui/menu-item.tsx frontend/src/features/menu/Menu.tsx PR_DESCRIPTION.md create_pr.bat
+git add frontend/src/shared/ui/ui/menu-item.tsx frontend/src/features/menu/Menu.tsx instructions/workflows/PR_DESCRIPTION.md create_pr.bat
 
 # Создайте коммит
 git commit -m "feat: улучшена поддержка лимита количества блюд в корзине
@@ -59,7 +59,7 @@ git commit -m "feat: улучшена поддержка лимита колич
 git push origin feat/cart-item-quantity-limit
 
 # Создайте PR
-gh pr create --base main --head feat/cart-item-quantity-limit --title "feat: улучшена поддержка лимита количества блюд в корзине" --body-file PR_DESCRIPTION.md --web
+gh pr create --base main --head feat/cart-item-quantity-limit --title "feat: улучшена поддержка лимита количества блюд в корзине" --body-file instructions/workflows/PR_DESCRIPTION.md --web
 ```
 
 ## Проверка работы

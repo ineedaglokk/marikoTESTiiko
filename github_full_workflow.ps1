@@ -64,8 +64,8 @@ Write-Host ""
 
 # 4. Создаем PR через API
 Write-Host "5. Создаем Pull Request через GitHub API..." -ForegroundColor Yellow
-if (Test-Path "PR_DESCRIPTION.md") {
-    $filePath = (Resolve-Path "PR_DESCRIPTION.md").Path
+if (Test-Path "instructions/workflows/PR_DESCRIPTION.md") {
+    $filePath = (Resolve-Path "instructions/workflows/PR_DESCRIPTION.md").Path
     $body = [System.IO.File]::ReadAllText($filePath, [System.Text.Encoding]::UTF8)
 } else {
     $body = "Добавлена функциональность ограничения максимального количества одинаковых блюд в корзине."

@@ -96,4 +96,4 @@ gh pr create --base main --head feat/cart-item-quantity-limit --title "feat: о�
 - `frontend/src/features/menu/Menu.tsx` - добавлены проверки и уведомления
 
 ### Документация:
-- `CHANGES_FOR_VK_APP.md` - инструкция для применения изменений в ветке vk_app
+- `instructions/integrations/CHANGES_FOR_VK_APP.md` - инструкция для применения изменений в ветке vk_app

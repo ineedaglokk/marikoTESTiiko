@@ -93,7 +93,7 @@ git --version
 ### Вариант 2: Выполнить команды вручную
 
 1. Откройте Git Bash в папке проекта
-2. Выполните команды из файла `CREATE_PR_SIMPLE.md`
+2. Выполните команды из файла `instructions/workflows/CREATE_PR_SIMPLE.md`
 
 ## Преимущества Git Bash
 
