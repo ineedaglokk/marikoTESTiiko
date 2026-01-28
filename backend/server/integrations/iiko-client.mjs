@@ -82,9 +82,9 @@ const ensureAccessToken = async (apiLogin) => {
   return fresh.token;
 };
 
-const buildIikoOrderPayload = (config, order) => {
+const buildIikoDeliveryPayload = (config, order) => {
   const items = (order.items ?? []).map((item) => ({
-    productId: item.id,
+    productId: item.iiko_product_id || item.id, // поддержка маппинга iiko ID
     type: "Product",
     amount: item.amount ?? item.quantity ?? 1,
     price: item.price ?? 0,
@@ -105,46 +105,55 @@ const buildIikoOrderPayload = (config, order) => {
         ]
       : undefined;
 
+  // Определяем тип заказа для iiko
+  const isDelivery = order.order_type === "delivery";
+  const orderServiceType = isDelivery ? "DeliveryByCourier" : "DeliveryByClient"; // DeliveryByClient = самовывоз
+
   const payload = {
     organizationId: config.iiko_organization_id,
     terminalGroupId: config.iiko_terminal_group_id,
-    externalNumber: order.external_id,
     createOrderSettings: {
       transportToFrontTimeout: 40,
     },
     order: {
+      orderServiceType,
       sourceKey: config.source_key ?? undefined,
       phone,
       customer: {
         name: customerName,
         phone,
       },
-      externalId: order.external_id,
       comment: order.comment ?? undefined,
-      deliveryPoint: order.delivery_address
-        ? {
-            address: {
-              comment: order.delivery_address,
-            },
-          }
-        : undefined,
       items,
       payments,
     },
   };
 
-  if (order.order_type === "pickup") {
-    payload.order.deliveryPoint = undefined;
-  }
+  // Добавляем адрес доставки только для delivery
+  if (isDelivery && order.delivery_address) {
+    payload.order.deliveryPoint = {
+      address: {
+        street: {
+          name: order.delivery_street || order.delivery_address,
+        },
+        house: order.delivery_house || "1",
+      },
+      comment: order.delivery_address,
+    };
 
-  if (config.delivery_terminal_id && payload.order.deliveryPoint) {
-    payload.order.deliveryPoint.terminalId = config.delivery_terminal_id;
+    if (config.delivery_terminal_id) {
+      payload.order.deliveryPoint.terminalId = config.delivery_terminal_id;
+    }
   }
 
   return payload;
 };
 
 export const iikoClient = {
+  /**
+   * Создаёт заказ доставки в iiko через Cloud API
+   * Использует endpoint /api/1/deliveries/create
+   */
   async createOrder(config, order) {
     if (!config?.iiko_organization_id || !config?.iiko_terminal_group_id) {
       return {
@@ -161,8 +170,10 @@ export const iikoClient = {
 
     try {
       const token = await ensureAccessToken(config.api_login);
-      const payload = buildIikoOrderPayload(config, order);
-      const url = `${IIKO_BASE_URL}/api/1/orders/create`;
+      const payload = buildIikoDeliveryPayload(config, order);
+
+      // Используем deliveries/create для заказов доставки/самовывоза
+      const url = `${IIKO_BASE_URL}/api/1/deliveries/create`;
       const response = await requestJson(url, {
         method: "POST",
         headers: {
@@ -187,6 +198,72 @@ export const iikoClient = {
         success: false,
         error: error?.message || "iiko: Ошибка создания заказа",
         response: error?.response,
+      };
+    }
+  },
+
+  /**
+   * Получает номенклатуру (меню) из iiko
+   */
+  async getNomenclature(config) {
+    if (!config?.iiko_organization_id || !config?.api_login) {
+      return { success: false, error: "iiko: Не указаны organization_id или api_login" };
+    }
+
+    try {
+      const token = await ensureAccessToken(config.api_login);
+      const url = `${IIKO_BASE_URL}/api/1/nomenclature`;
+      const response = await requestJson(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ organizationId: config.iiko_organization_id }),
+      });
+
+      return {
+        success: true,
+        products: response?.products ?? [],
+        groups: response?.groups ?? [],
+        categories: response?.productCategories ?? [],
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error?.message || "iiko: Ошибка получения номенклатуры",
+      };
+    }
+  },
+
+  /**
+   * Получает типы оплаты из iiko
+   */
+  async getPaymentTypes(config) {
+    if (!config?.iiko_organization_id || !config?.api_login) {
+      return { success: false, error: "iiko: Не указаны organization_id или api_login" };
+    }
+
+    try {
+      const token = await ensureAccessToken(config.api_login);
+      const url = `${IIKO_BASE_URL}/api/1/payment_types`;
+      const response = await requestJson(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ organizationIds: [config.iiko_organization_id] }),
+      });
+
+      return {
+        success: true,
+        paymentTypes: response?.paymentTypes ?? [],
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error?.message || "iiko: Ошибка получения типов оплаты",
       };
     }
   },
