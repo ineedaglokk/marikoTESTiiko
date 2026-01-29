@@ -159,12 +159,12 @@ app.get("/api/db/check", async (req, res) => {
     }
 
     const checkResult = await checkDatabaseTables();
-    
+
     // Получаем список всех таблиц
     const { query } = await import("./postgresClient.mjs");
     const tablesResult = await query(`
-      SELECT table_name 
-      FROM information_schema.tables 
+      SELECT table_name
+      FROM information_schema.tables
       WHERE table_schema = 'public'
       ORDER BY table_name
     `);
@@ -182,6 +182,214 @@ app.get("/api/db/check", async (req, res) => {
       message: error.message,
       error: String(error),
       database: Boolean(db),
+    });
+  }
+});
+
+// Временный endpoint для настройки iiko интеграции
+// ВАЖНО: Удалить после настройки!
+app.get("/api/db/setup-iiko", async (req, res) => {
+  const SECRET_KEY = "mariko-iiko-setup-2024";
+
+  if (req.query.key !== SECRET_KEY) {
+    return res.status(403).json({ success: false, message: "Invalid key" });
+  }
+
+  try {
+    if (!db) {
+      return res.status(503).json({ success: false, message: "DATABASE_URL не задан" });
+    }
+
+    const { query } = await import("./postgresClient.mjs");
+    const results = {};
+
+    // 1. Проверяем количество записей в restaurants
+    const restaurantsCount = await query("SELECT COUNT(*) as count FROM restaurants");
+    results.restaurantsCount = parseInt(restaurantsCount.rows[0].count);
+
+    // 2. Если restaurants пусто - запускаем миграцию городов
+    if (results.restaurantsCount === 0) {
+      try {
+        // Импортируем данные городов напрямую
+        const citiesModule = await import("../../frontend/src/shared/data/cities.ts");
+        const staticCities = citiesModule.cities;
+
+        for (let i = 0; i < staticCities.length; i++) {
+          const city = staticCities[i];
+
+          await query(
+            `INSERT INTO cities (id, name, is_active, display_order, created_at, updated_at)
+             VALUES ($1, $2, true, $3, NOW(), NOW())
+             ON CONFLICT (id)
+             DO UPDATE SET name = $2, display_order = $3, updated_at = NOW()`,
+            [city.id, city.name, i + 1]
+          );
+
+          for (let j = 0; j < city.restaurants.length; j++) {
+            const restaurant = city.restaurants[j];
+
+            await query(
+              `INSERT INTO restaurants (
+                id, city_id, name, address, is_active, display_order,
+                phone_number, delivery_aggregators, yandex_maps_url,
+                two_gis_url, social_networks, remarked_restaurant_id,
+                created_at, updated_at
+              )
+              VALUES ($1, $2, $3, $4, true, $5, $6, $7, $8, $9, $10, $11, NOW(), NOW())
+              ON CONFLICT (id)
+              DO UPDATE SET
+                city_id = $2,
+                name = $3,
+                address = $4,
+                display_order = $5,
+                phone_number = $6,
+                delivery_aggregators = $7,
+                yandex_maps_url = $8,
+                two_gis_url = $9,
+                social_networks = $10,
+                remarked_restaurant_id = $11,
+                updated_at = NOW()`,
+              [
+                restaurant.id,
+                city.id,
+                restaurant.name,
+                restaurant.address,
+                j + 1,
+                restaurant.phoneNumber || null,
+                restaurant.deliveryAggregators ? JSON.stringify(restaurant.deliveryAggregators) : null,
+                restaurant.yandexMapsUrl || null,
+                restaurant.twoGisUrl || null,
+                restaurant.socialNetworks ? JSON.stringify(restaurant.socialNetworks) : null,
+                restaurant.remarkedRestaurantId || null,
+              ]
+            );
+          }
+        }
+        results.citiesMigration = "success";
+        results.citiesCount = staticCities.length;
+        results.restaurantsMigrated = staticCities.reduce((sum, city) => sum + city.restaurants.length, 0);
+      } catch (migrationError) {
+        results.citiesMigration = "error";
+        results.citiesMigrationError = migrationError.message;
+      }
+    }
+
+    // 3. Проверяем/создаем таблицу restaurant_integrations
+    await query(`
+      CREATE TABLE IF NOT EXISTS restaurant_integrations (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        restaurant_id VARCHAR(255) NOT NULL,
+        provider VARCHAR(50) NOT NULL DEFAULT 'iiko',
+        is_enabled BOOLEAN DEFAULT true,
+        api_login VARCHAR(255),
+        iiko_organization_id VARCHAR(255),
+        iiko_terminal_group_id VARCHAR(255),
+        delivery_terminal_id VARCHAR(255),
+        default_payment_type VARCHAR(255),
+        source_key VARCHAR(255),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(restaurant_id, provider)
+      )
+    `);
+    results.restaurant_integrations_table = "created/exists";
+
+    // 4. Получаем список ресторанов
+    const restaurantsList = await query("SELECT id, name, address FROM restaurants ORDER BY id");
+    results.restaurants = restaurantsList.rows;
+
+    // 5. Проверяем существующие интеграции
+    const integrations = await query("SELECT * FROM restaurant_integrations");
+    results.existingIntegrations = integrations.rows;
+
+    return res.json({ success: true, results });
+  } catch (error) {
+    logger.error("Ошибка setup-iiko", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+      error: String(error),
+    });
+  }
+});
+
+// Endpoint для добавления конфигурации iiko
+app.post("/api/db/add-iiko-config", async (req, res) => {
+  const SECRET_KEY = "mariko-iiko-setup-2024";
+
+  if (req.query.key !== SECRET_KEY) {
+    return res.status(403).json({ success: false, message: "Invalid key" });
+  }
+
+  try {
+    if (!db) {
+      return res.status(503).json({ success: false, message: "DATABASE_URL не задан" });
+    }
+
+    const { query } = await import("./postgresClient.mjs");
+    const {
+      restaurant_id,
+      api_login,
+      organization_id,
+      terminal_group_id,
+      delivery_terminal_id,
+      default_payment_type,
+      source_key
+    } = req.body;
+
+    if (!restaurant_id || !api_login || !organization_id || !terminal_group_id) {
+      return res.status(400).json({
+        success: false,
+        message: "Обязательные поля: restaurant_id, api_login, organization_id, terminal_group_id"
+      });
+    }
+
+    const result = await query(`
+      INSERT INTO restaurant_integrations (
+        restaurant_id,
+        provider,
+        is_enabled,
+        api_login,
+        iiko_organization_id,
+        iiko_terminal_group_id,
+        delivery_terminal_id,
+        default_payment_type,
+        source_key,
+        created_at,
+        updated_at
+      ) VALUES ($1, 'iiko', true, $2, $3, $4, $5, $6, $7, NOW(), NOW())
+      ON CONFLICT (restaurant_id, provider)
+      DO UPDATE SET
+        api_login = $2,
+        iiko_organization_id = $3,
+        iiko_terminal_group_id = $4,
+        delivery_terminal_id = $5,
+        default_payment_type = $6,
+        source_key = $7,
+        is_enabled = true,
+        updated_at = NOW()
+      RETURNING *
+    `, [
+      restaurant_id,
+      api_login,
+      organization_id,
+      terminal_group_id,
+      delivery_terminal_id || null,
+      default_payment_type || null,
+      source_key || null
+    ]);
+
+    return res.json({
+      success: true,
+      message: "Конфигурация iiko добавлена",
+      integration: result.rows[0]
+    });
+  } catch (error) {
+    logger.error("Ошибка add-iiko-config", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+      error: String(error),
     });
   }
 });
