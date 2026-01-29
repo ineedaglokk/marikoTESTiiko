@@ -393,6 +393,52 @@ app.post("/api/db/add-iiko-config", async (req, res) => {
   }
 });
 
+// Endpoint для добавления админа
+app.post("/api/db/add-admin", async (req, res) => {
+  const SECRET_KEY = "mariko-iiko-setup-2024";
+
+  if (req.query.key !== SECRET_KEY) {
+    return res.status(403).json({ success: false, message: "Invalid key" });
+  }
+
+  try {
+    if (!db) {
+      return res.status(503).json({ success: false, message: "DATABASE_URL не задан" });
+    }
+
+    const { query } = await import("./postgresClient.mjs");
+    const { telegram_id, name, role = "super_admin" } = req.body;
+
+    if (!telegram_id) {
+      return res.status(400).json({
+        success: false,
+        message: "Обязательное поле: telegram_id"
+      });
+    }
+
+    const result = await query(`
+      INSERT INTO admin_users (telegram_id, name, role, created_at, updated_at)
+      VALUES ($1, $2, $3, NOW(), NOW())
+      ON CONFLICT (telegram_id)
+      DO UPDATE SET name = $2, role = $3, updated_at = NOW()
+      RETURNING *
+    `, [telegram_id, name || "Admin", role]);
+
+    return res.json({
+      success: true,
+      message: "Админ добавлен",
+      admin: result.rows[0]
+    });
+  } catch (error) {
+    logger.error("Ошибка add-admin", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+      error: String(error),
+    });
+  }
+});
+
 registerCartRoutes(app);
 
 const adminRouter = createAdminRouter();
