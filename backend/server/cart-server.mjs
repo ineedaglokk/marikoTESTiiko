@@ -210,9 +210,8 @@ app.get("/api/db/setup-iiko", async (req, res) => {
     // 2. Если restaurants пусто - запускаем миграцию городов
     if (results.restaurantsCount === 0) {
       try {
-        // Импортируем данные городов напрямую
-        const citiesModule = await import("../../frontend/src/shared/data/cities.ts");
-        const staticCities = citiesModule.cities;
+        // Импортируем данные городов из backend
+        const { cities: staticCities } = await import("./data/cities.mjs");
 
         for (let i = 0; i < staticCities.length; i++) {
           const city = staticCities[i];
