@@ -4,6 +4,27 @@
 
 ---
 
+## Текущий статус интеграции
+
+| Шаг | Статус | Примечание |
+|-----|--------|------------|
+| Шаг 1: Вход в iikoWeb | ✅ Готово | |
+| Шаг 2: Создание API ключа | ✅ Готово | Ключ получен |
+| Шаг 3: Получение Organization ID и Terminal Group ID | ✅ Готово | ID получены |
+| Шаг 4: Настройка номенклатуры | ⏳ Ожидает | Нужна помощь поддержки iiko |
+| Шаг 5: Добавление конфигурации в БД | ✅ Готово | Добавлено для nn-rozh |
+| Шаг 6: Маппинг товаров | ⏳ Ожидает | После настройки номенклатуры |
+| Шаг 7: Тестирование | ⏳ Ожидает | После маппинга товаров |
+
+### Что сделано (29.01.2026):
+- Backend задеплоен на Railway: `marikotestiiko-production.up.railway.app`
+- БД PostgreSQL настроена и работает
+- Загружено **24 города** и **32 ресторана**
+- Создана таблица `restaurant_integrations`
+- Добавлена конфигурация iiko для ресторана `nn-rozh` (Нижний Новгород, Рождественская, 39)
+
+---
+
 ## Содержание
 
 1. [Что такое iiko и зачем нужна интеграция](#что-такое-iiko-и-зачем-нужна-интеграция)
@@ -47,6 +68,8 @@
 
 ## Шаг 1: Вход в iikoWeb
 
+### Статус: ✅ ГОТОВО
+
 ### Что делаем
 Заходим в веб-интерфейс управления iiko.
 
@@ -62,11 +85,11 @@
 ### Результат
 Попадаем в главное меню iikoWeb. Здесь видим разные разделы: Меню и цены, Внешние заказы, Интеграции и т.д.
 
-### 
-
 ---
 
 ## Шаг 2: Создание API ключа
+
+### Статус: ✅ ГОТОВО
 
 ### Что делаем
 Создаём специальный ключ для подключения нашего приложения к iiko.
@@ -93,11 +116,11 @@
 
 ### Наш API Ключ: `0a646c4cb3da418aaf560d62d570f518`
 
-### 
-
 ---
 
 ## Шаг 3: Получение Organization ID и Terminal Group ID
+
+### Статус: ✅ ГОТОВО
 
 ### Что делаем
 Получаем технические ID организации и терминала через API запросы.
@@ -184,11 +207,11 @@ curl -s -X POST "https://api-ru.iiko.services/api/1/terminal_groups" \
 | Organization ID | `2e688113-401c-4d48-b28c-53852ece72aa` |
 | Terminal Group ID | `dd70ac26-e6c9-9baf-019b-c1bdd21a0066` |
 
-### 
-
 ---
 
 ## Шаг 4: Настройка номенклатуры (меню)
+
+### Статус: ⏳ ОЖИДАЕТ (нужна помощь поддержки iiko)
 
 ### Что делаем
 Создаём товары (блюда) в iiko, которые можно будет заказывать.
@@ -229,75 +252,65 @@ curl -s -X POST "https://api-ru.iiko.services/api/1/nomenclature" \
 
 Если `products` не пустой — номенклатура есть.
 
-### Статус: ⏳ ОЖИДАЕТ (нужна помощь поддержки iiko)
-
 ---
 
 ## Шаг 5: Добавление конфигурации в базу данных
 
-### Что делаем
-Сохраняем полученные данные в базу данных нашего приложения.
+### Статус: ✅ ГОТОВО
 
-### Как делаем
+### Что сделано
+Конфигурация добавлена через API endpoint на Railway.
 
-#### Вариант 1: Через Railway (если БД там)
+### Текущая конфигурация в БД
 
-1. Заходим на https://railway.app
-2. Открываем проект
-3. Находим PostgreSQL сервис
-4. Нажимаем **"Data"** или **"Query"**
-5. Выполняем SQL запрос
+| Поле | Значение |
+|------|----------|
+| restaurant_id | `nn-rozh` |
+| provider | `iiko` |
+| is_enabled | `true` |
+| api_login | `0a646c4cb3da418aaf560d62d570f518` |
+| organization_id | `2e688113-401c-4d48-b28c-53852ece72aa` |
+| terminal_group_id | `dd70ac26-e6c9-9baf-019b-c1bdd21a0066` |
 
-#### Вариант 2: Через терминал
+### Как добавить конфигурацию для других ресторанов
 
-Подключаемся к БД и выполняем запрос.
+Использовать API endpoint (временный, для настройки):
 
-### SQL запрос для добавления конфигурации
-
-```sql
--- Сначала узнаём какие рестораны есть в системе
-SELECT id, name, address FROM restaurants;
-
--- Затем добавляем конфигурацию iiko для нужного ресторана
-INSERT INTO restaurant_integrations (
-  restaurant_id,
-  provider,
-  is_enabled,
-  api_login,
-  iiko_organization_id,
-  iiko_terminal_group_id,
-  delivery_terminal_id,
-  default_payment_type,
-  source_key,
-  created_at
-) VALUES (
-  'nn-rozh',                                    -- ID ресторана (замени на нужный!)
-  'iiko',                                       -- провайдер интеграции
-  true,                                         -- включено
-  '0a646c4cb3da418aaf560d62d570f518',          -- API Login
-  '2e688113-401c-4d48-b28c-53852ece72aa',      -- Organization ID
-  'dd70ac26-e6c9-9baf-019b-c1bdd21a0066',      -- Terminal Group ID
-  NULL,                                         -- ID терминала доставки (опционально)
-  NULL,                                         -- ID типа оплаты (опционально)
-  NULL,                                         -- ключ источника (опционально)
-  NOW()
-);
+```bash
+curl -X POST "https://marikotestiiko-production.up.railway.app/api/db/add-iiko-config?key=mariko-iiko-setup-2024" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "restaurant_id": "RESTAURANT_ID",
+    "api_login": "0a646c4cb3da418aaf560d62d570f518",
+    "organization_id": "2e688113-401c-4d48-b28c-53852ece72aa",
+    "terminal_group_id": "dd70ac26-e6c9-9baf-019b-c1bdd21a0066"
+  }'
 ```
 
-### Примеры restaurant_id в нашей системе
+### Доступные рестораны
+
+Полный список можно получить через:
+```bash
+curl "https://marikotestiiko-production.up.railway.app/api/db/setup-iiko?key=mariko-iiko-setup-2024"
+```
+
+Основные рестораны:
 
 | restaurant_id | Город | Адрес |
 |---------------|-------|-------|
 | `nn-rozh` | Нижний Новгород | Рождественская, 39 |
 | `nn-park` | Нижний Новгород | Парк Швейцария |
+| `nn-volga` | Нижний Новгород | Волжская набережная, 23а |
 | `spb-sadovaya` | Санкт-Петербург | Малая Садовая, 3/54 |
+| `spb-sennaya` | Санкт-Петербург | Сенная, 5 |
+| `kazan-bulachnaya` | Казань | Право-Булачная, 33 |
 | `kazan-pushkina` | Казань | Пушкина, 10 |
-
-### Статус: ⏳ ОЖИДАЕТ (после настройки номенклатуры)
 
 ---
 
 ## Шаг 6: Маппинг товаров
+
+### Статус: ⏳ ОЖИДАЕТ (после настройки номенклатуры в iiko)
 
 ### Что делаем
 Сопоставляем ID товаров в нашей системе с ID товаров в iiko.
@@ -310,17 +323,23 @@ INSERT INTO restaurant_integrations (
 #### 1. Получаем список товаров из iiko
 
 ```bash
+# Сначала получаем токен
+TOKEN=$(curl -s -X POST "https://api-ru.iiko.services/api/1/access_token" \
+  -H "Content-Type: application/json" \
+  -d '{"apiLogin": "0a646c4cb3da418aaf560d62d570f518"}' | jq -r '.token')
+
+# Затем получаем номенклатуру
 curl -s -X POST "https://api-ru.iiko.services/api/1/nomenclature" \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer {TOKEN}" \
-  -d '{"organizationId": "2e688113-401c-4d48-b28c-53852ece72aa"}'
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"organizationId": "2e688113-401c-4d48-b28c-53852ece72aa"}' | jq '.products'
 ```
 
 #### 2. Добавляем поле iiko_product_id в таблицу menu_items
 
 ```sql
 -- Добавляем колонку для хранения iiko ID
-ALTER TABLE menu_items ADD COLUMN iiko_product_id VARCHAR(255);
+ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS iiko_product_id VARCHAR(255);
 
 -- Обновляем конкретный товар
 UPDATE menu_items
@@ -335,11 +354,11 @@ WHERE id = 'ID_ТОВАРА_В_НАШЕЙ_СИСТЕМЕ';
 | `item-001` | Хачапури по-аджарски | `abc123-def456-...` |
 | `item-002` | Хинкали | `xyz789-qwe012-...` |
 
-### Статус: ⏳ ОЖИДАЕТ (после настройки номенклатуры)
-
 ---
 
 ## Шаг 7: Тестирование
+
+### Статус: ⏳ ОЖИДАЕТ (после маппинга товаров)
 
 ### Что делаем
 Проверяем что заказы успешно отправляются в iiko.
@@ -349,8 +368,12 @@ WHERE id = 'ID_ТОВАРА_В_НАШЕЙ_СИСТЕМЕ';
 #### 1. Создаём тестовый заказ через API
 
 ```bash
-TOKEN="..." # получаем свежий токен
+# Получаем токен
+TOKEN=$(curl -s -X POST "https://api-ru.iiko.services/api/1/access_token" \
+  -H "Content-Type: application/json" \
+  -d '{"apiLogin": "0a646c4cb3da418aaf560d62d570f518"}' | jq -r '.token')
 
+# Создаем заказ
 curl -s -X POST "https://api-ru.iiko.services/api/1/deliveries/create" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
@@ -363,7 +386,7 @@ curl -s -X POST "https://api-ru.iiko.services/api/1/deliveries/create" \
       "customer": {
         "name": "Тестовый клиент"
       },
-      "comment": "Тестовый заказ",
+      "comment": "Тестовый заказ из Mariko App",
       "deliveryPoint": {
         "address": {
           "street": { "name": "Тестовая улица" },
@@ -388,8 +411,6 @@ curl -s -X POST "https://api-ru.iiko.services/api/1/deliveries/create" \
 #### 3. Проверяем через приложение
 
 Делаем заказ через мини-апп и смотрим появился ли он в iiko.
-
-### Статус: ⏳ ОЖИДАЕТ (после всех предыдущих шагов)
 
 ---
 
@@ -419,11 +440,39 @@ curl -s -X POST "https://api-ru.iiko.services/api/1/deliveries/create" \
 
 ---
 
+## Инфраструктура проекта
+
+### Railway (Backend + PostgreSQL)
+
+| Компонент | URL/Значение |
+|-----------|--------------|
+| Backend API | `https://marikotestiiko-production.up.railway.app` |
+| PostgreSQL | Подключен к backend через DATABASE_URL |
+| Project ID | `3225d8bb-782f-4ac1-b1a1-c43ba76f7e54` |
+
+### Полезные API endpoints (временные, для настройки)
+
+```bash
+# Проверить состояние БД и список ресторанов
+curl "https://marikotestiiko-production.up.railway.app/api/db/setup-iiko?key=mariko-iiko-setup-2024"
+
+# Добавить конфигурацию iiko для ресторана
+curl -X POST "https://marikotestiiko-production.up.railway.app/api/db/add-iiko-config?key=mariko-iiko-setup-2024" \
+  -H "Content-Type: application/json" \
+  -d '{"restaurant_id": "...", "api_login": "...", "organization_id": "...", "terminal_group_id": "..."}'
+
+# Проверить таблицы в БД
+curl "https://marikotestiiko-production.up.railway.app/api/db/check"
+```
+
+---
+
 ## Полезные ссылки
 
 - **iiko Cloud API документация:** https://api-ru.iiko.services/
 - **Справочник API методов:** https://ru.iiko.help/articles/api-documentations/
 - **iikoWeb (наш демо):** https://353-003-988.iikoweb.ru/navigator/ru-RU/index.html#/main
+- **Railway Dashboard:** https://railway.app
 
 ---
 
@@ -433,21 +482,34 @@ curl -s -X POST "https://api-ru.iiko.services/api/1/deliveries/create" \
 |------|----------|
 | `backend/server/integrations/iiko-client.mjs` | Клиент для API iiko |
 | `backend/server/services/integrationService.mjs` | Сервис отправки заказов |
-| `backend/server/databaseInit.mjs` | Схема таблицы `restaurant_integrations` |
+| `backend/server/databaseInit.mjs` | Схема таблиц БД |
+| `backend/server/data/cities.mjs` | Данные городов и ресторанов |
 
 ---
 
 ## Чеклист готовности к продакшену
 
-- [ ] API Login получен и работает
-- [ ] Organization ID и Terminal Group ID получены
-- [ ] Номенклатура настроена в iiko
+- [x] API Login получен и работает
+- [x] Organization ID и Terminal Group ID получены
+- [ ] Номенклатура настроена в iiko (ожидает поддержки)
 - [ ] Типы оплаты настроены
-- [ ] Конфигурация добавлена в БД
+- [x] Конфигурация добавлена в БД (nn-rozh)
 - [ ] Маппинг товаров сделан
 - [ ] Тестовый заказ успешно создан
 - [ ] Заказ появился в iikoWeb
 
 ---
 
-*Последнее обновление: Январь 2026*
+## Следующие шаги
+
+1. **Написать в поддержку iiko** для настройки номенклатуры на демо-стенде
+2. **После получения номенклатуры:**
+   - Получить список товаров через API
+   - Сделать маппинг с товарами в нашей БД
+   - Отправить тестовый заказ
+3. **Настроить frontend** на Vercel
+4. **Создать Telegram бота** для тестирования мини-аппа
+
+---
+
+*Последнее обновление: 29 января 2026*

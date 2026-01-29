@@ -1,6 +1,8 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
-import { getUserId, getPlatform } from "@/lib/platform";
+import { getUserId } from "@/lib/platform";
 import { onboardingServerApi } from "@shared/api/onboarding";
+
+const ONBOARDING_LOCAL_KEY = "mariko_onboarding_shown";
 
 interface OnboardingContextType {
   onboardingTourShown: boolean;
@@ -22,8 +24,27 @@ interface OnboardingProviderProps {
   children: ReactNode;
 }
 
+// Читаем из localStorage как fallback
+const getLocalOnboardingFlag = (): boolean => {
+  try {
+    return localStorage.getItem(ONBOARDING_LOCAL_KEY) === "true";
+  } catch {
+    return false;
+  }
+};
+
+// Сохраняем в localStorage как fallback
+const setLocalOnboardingFlag = (shown: boolean): void => {
+  try {
+    localStorage.setItem(ONBOARDING_LOCAL_KEY, shown ? "true" : "false");
+  } catch {
+    // Игнорируем ошибки localStorage
+  }
+};
+
 export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
-  const [onboardingTourShown, setOnboardingTourShownState] = useState<boolean>(false);
+  // Инициализируем из localStorage чтобы избежать мигания
+  const [onboardingTourShown, setOnboardingTourShownState] = useState<boolean>(() => getLocalOnboardingFlag());
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -31,10 +52,21 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
     let scheduledHandle: number | ReturnType<typeof setTimeout> | null = null;
 
     const loadOnboardingFlag = async () => {
+      // Сначала проверяем localStorage
+      const localFlag = getLocalOnboardingFlag();
+      if (localFlag) {
+        // Если в localStorage уже true, не показываем онбординг
+        if (!cancelled) {
+          setOnboardingTourShownState(true);
+          setIsLoading(false);
+        }
+        return;
+      }
+
       // Используем getUserId(), который возвращает строку для обеих платформ
       const userId = getUserId();
       if (!userId) {
-        // Если пользователь не определен, считаем что подсказки не показывались
+        // Если пользователь не определен, используем только localStorage
         if (!cancelled) {
           setIsLoading(false);
         }
@@ -46,12 +78,14 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
         const shown = await onboardingServerApi.getOnboardingTourShown(userId);
         if (!cancelled) {
           setOnboardingTourShownState(shown);
+          // Синхронизируем с localStorage
+          setLocalOnboardingFlag(shown);
         }
       } catch (error) {
         console.warn("[onboarding] failed to load tour flag", error);
-        // В случае ошибки считаем что подсказки не показывались
+        // В случае ошибки используем localStorage
         if (!cancelled) {
-          setOnboardingTourShownState(false);
+          setOnboardingTourShownState(localFlag);
         }
       } finally {
         if (!cancelled) {
@@ -95,19 +129,23 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
   }, []);
 
   const setOnboardingTourShown = async (shown: boolean) => {
+    // Сразу обновляем состояние и localStorage для мгновенной реакции UI
+    setOnboardingTourShownState(shown);
+    setLocalOnboardingFlag(shown);
+
     // Используем getUserId(), который возвращает строку для обеих платформ
     const userId = getUserId();
     if (!userId) {
-      console.warn("[onboarding] user ID not available, cannot persist tour flag");
+      console.warn("[onboarding] user ID not available, saved only to localStorage");
       return;
     }
 
     try {
       // Передаем userId как строку (для VK это будет VK ID, для Telegram - Telegram ID)
       await onboardingServerApi.setOnboardingTourShown(userId, shown);
-      setOnboardingTourShownState(shown);
     } catch (error) {
-      console.warn("[onboarding] failed to persist tour flag", error);
+      console.warn("[onboarding] failed to persist tour flag to server", error);
+      // Данные уже сохранены в localStorage, так что UI не пострадает
     }
   };
 
